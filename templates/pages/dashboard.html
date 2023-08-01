@@ -27,8 +27,12 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('response = ', response);
+                return response.json();
+            })
             .then(data => {
+                console.log('data = ', data);
                 // Vider le conteneur des résultats précédents et ajouter les nouveaux résultats
                 searchResultsContainer.innerHTML = '';
 
