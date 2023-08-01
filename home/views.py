@@ -10,16 +10,6 @@ df_films = pd.read_csv(file_path)
 
 from sklearn.neighbors import NearestNeighbors
 
-url = "https://api.themoviedb.org/3/authentication"
-
-headers = {
-    "accept": "application/json",
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1OGQ1MTg2ODc5Y2Y4NjJmZTYyMTQwYTljNmViNGFlMiIsInN1YiI6IjVmYWQwM2QzZDdmYmRhMDAzZDk3ZDc0NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.waE5IPpm0NeuZ17E5FjkqJWIGLpmR11pITDjEOBvqOM"
-}
-
-response = requests.get(url, headers=headers)
-IMDb_response = response.json();
-
 # Cleaning
 colonnes = ['movie_title','title_year','genres','duration','budget','imdb_score','actor_1_name','director_name']
 df_movies_raw = df_films[['country']].copy()
@@ -114,7 +104,7 @@ def index(request):
     movie_titles = df_movies['movie_title'].tolist()
     # Change all movie titles with single quotes to double quotes
     # movie_titles = json.dumps(movie_titles)
-    return render(request, 'pages/dashboard.html', {'movie_titles': movie_titles, 'IMDb_response': IMDb_response })
+    return render(request, 'pages/dashboard.html', {'movie_titles': movie_titles})
 
 def search_movies(request):
     if request.method == 'POST':
