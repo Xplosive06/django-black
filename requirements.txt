@@ -1,0 +1,12 @@
+django
+gunicorn
+python-dotenv
+whitenoise
+django-admin-black==1.0.8
+numpy
+scikit-learn
+matplotlib
+seaborn
+scipy
+# psycopg2-binary
+# mysqlclient

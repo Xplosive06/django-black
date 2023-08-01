@@ -1,0 +1,210 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+<script>
+    function createImageElement(url) {
+        const imgElement = document.createElement('img');
+        imgElement.src = url;
+        imgElement.alt = 'Poster';
+        imgElement.width = 100;
+        return imgElement;
+    }
+    function createParagraph(text) {
+        const paragraph = document.createElement('p');
+        paragraph.textContent = text;
+        return paragraph;
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchForm = document.getElementById('search-form');
+        const searchResultsContainer = document.getElementById('search-results');
+
+        searchForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(searchForm);
+
+
+            fetch('{% url "search_movies" %}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Vider le conteneur des résultats précédents et ajouter les nouveaux résultats
+                searchResultsContainer.innerHTML = '';
+
+                const searchQuery = formData.get('search_query');
+                // Ajouter le titre avec le film recherché
+                const titleElement = document.createElement('h3');
+                titleElement.textContent = `Liste de recommendations pour le film "${searchQuery}":`;
+                searchResultsContainer.appendChild(titleElement);
+
+                // Créer une liste pour afficher les résultats de recherche
+                const resultsList = document.createElement('div');
+                resultsList.classList.add('row');
+
+                data.results.forEach((movie, index) => {
+                    console.log('movie = ', movie);
+                    const movieCard = createMovieCard(movie.title, data.poster_urls[index], movie.movie_imdb_link, movie);
+                    resultsList.appendChild(movieCard);
+                });
+
+                searchResultsContainer.appendChild(resultsList);
+            })
+            .catch(error => {
+                console.error('Erreur lors de la recherche AJAX:', error);
+            });
+        });
+    });
+
+    // Fonction pour créer la carte d'un film
+    function createMovieCard(movieTitle, posterUrl, imdbLink, movieData) {
+        const cardDiv = document.createElement('div');
+
+        const card = document.createElement('div');
+        card.classList.add('card', 'card-user');
+        card.style.width = '18rem';
+
+        const cardBody = document.createElement('div');
+        cardBody.classList.add('card-body');
+
+        const authorDiv = document.createElement('div');
+        authorDiv.classList.add('author');
+
+        const avatarLink = document.createElement('a');
+        avatarLink.href = imdbLink;
+
+        const movieImage = document.createElement('img');
+        movieImage.classList.add('avatar');
+        movieImage.src = posterUrl;
+        movieImage.alt = movieTitle;
+
+        const titleH5 = document.createElement('h5');
+        titleH5.classList.add('title');
+        titleH5.textContent = movieTitle;
+
+        avatarLink.appendChild(movieImage);
+        avatarLink.appendChild(titleH5);
+
+        authorDiv.appendChild(avatarLink);
+
+        const cardDescription = document.createElement('div');
+        cardDescription.classList.add('card-description');
+        const titleYearParagraph = createParagraph(`Année: ${movieData.title_year}`);
+        const durationParagraph = createParagraph(`Durée: ${movieData.duration}`);
+        const genresParagraph = createParagraph(`Genres: ${movieData.genres}`);
+        const imdbScoreParagraph = createParagraph(`IMDb Score: ${movieData.imdb_score}`);
+
+        // Ajouter les paragraphes dans la description de la carte
+        cardDescription.appendChild(titleYearParagraph);
+        cardDescription.appendChild(durationParagraph);
+        cardDescription.appendChild(genresParagraph);
+        cardDescription.appendChild(imdbScoreParagraph);
+
+        cardBody.appendChild(authorDiv);
+        cardBody.appendChild(cardDescription);
+
+        const cardFooter = document.createElement('div');
+        cardFooter.classList.add('card-footer');
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.classList.add('button-container');
+
+        const buttonSite = createButton(imdbLink);
+
+        buttonContainer.appendChild(buttonSite);
+
+        cardFooter.appendChild(buttonContainer);
+
+        card.appendChild(cardBody);
+        card.appendChild(cardFooter);
+
+        cardDiv.appendChild(card);
+
+        return cardDiv;
+    }
+
+    // Fonction utilitaire pour créer un bouton avec une icône donnée
+    function createButton(href) {
+        const button = document.createElement('button');
+        button.classList.add('btn', 'btn-fill', 'btn-primary');
+        button.href = href;
+
+        const textElement = document.createTextNode('Voir sur IMDb');
+        button.appendChild(textElement);
+
+
+        return button;
+    }
+</script>
+
+
+<!-- Inclure le CSS personnalisé -->
+<style>
+  /* Votre CSS personnalisé pour l'autocomplétion */
+  .ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #27293d;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .ui-menu-item {
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  .ui-menu-item:hover {
+    background-color: #f0f0f0;
+  }
+  .card-body {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+</style>
+
+<script>
+    var movieTitles = {{ movie_titles | safe}};
+    jQuery(document).ready(function() {
+        jQuery('#search-input').autocomplete({
+            source: movieTitles,
+            minLength: 2
+        });
+    });
+</script>
+    
+
+<div class="content bg-image">
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-chart" style="padding: 30px;" >
+                <div class="card-header ">
+                    <div class="row">
+                        <div class="col-sm-12 text-left margin-mk">
+                            <h2 class="title-mk">CREUSEFLIX</h2>
+                            <h5 class="card-category" style="margin-bottom: 20px;" >Veuillez entrer le nom d'un film pour obtenir les meilleures recommandations basées sur celui-ci</h5>
+                            <!-- <li class="search-bar input-group">
+                                <button class="btn btn-link" id="search-button" data-toggle="modal" data-target="#searchModal"><i
+                                        class="tim-icons icon-zoom-split"></i>
+                                    <span class="d-lg-none d-md-block">Search</span>
+                                </button>
+                            </li> -->
+                            <form id="search-form">
+                                {% csrf_token %}
+                                <div class="col-md-5 pr-md-1">
+                                    <div class="form-group">
+                                        <input style="margin-bottom:10px" type="text" class="form-control" id="search-input" name="search_query" placeholder="Rechercher un film">
+                                        <button class="btn btn-fill btn-primary" type="submit">Rechercher</button>
+                                    </div>
+                                  </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="search-results" class="text-left margin-mk">                          
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

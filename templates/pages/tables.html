@@ -1,0 +1,151 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Inclure le script de Plotly depuis un CDN (par exemple) -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<!-- Variable JavaScript pour stocker les données de durée des films -->
+<script>
+  let durationData = [];
+  let moviesPerYearData = {};
+  let filmsByCountryData = {};
+</script>
+
+<!-- Requête AJAX pour récupérer les données de durée des films depuis la vue Django -->
+<script>
+  fetch('/histogram_data/')  // Remplacez cette URL par l'URL vers votre vue 'histogram_data'
+    .then(response => response.json())
+    .then(data => {
+      // Mettre à jour la variable durationData avec les données récupérées
+      durationData = data;
+
+  // Créer l'histogramme interactif avec Plotly
+  const dataBis = [
+    {
+      x: durationData,
+      type: 'histogram',
+      marker: {
+        color: 'blue'  // Vous pouvez personnaliser la couleur du histogramme ici
+      }
+    }
+  ];
+
+  const layout = {
+    title: 'Répartition des durées de films',
+    xaxis: {
+      title: 'Durée (minutes)'
+    },
+    yaxis: {
+      title: 'Nombre de films'
+    },
+    plot_bgcolor: 'rgba(0, 0, 0, 0.5)'  // Background transparent
+  };
+
+  // Afficher l'histogramme interactif dans le conteneur défini
+  Plotly.newPlot('histogram-container', dataBis, layout);
+
+    })
+    .catch(error => {
+      console.error('Erreur lors de la récupération des données de durée des films:', error);
+    });
+
+    fetch('/movies_per_year_data/')  // Remplacez cette URL par l'URL vers votre vue 'movies_per_year_data'
+    .then(response => response.json())
+    .then(data => {
+      // Mettre à jour la variable moviesPerYearData avec les données récupérées
+      moviesPerYearData = data;
+
+      // Créer le graphique de ligne interactif avec Plotly
+      const years = moviesPerYearData.years;
+      const counts = moviesPerYearData.count;
+
+      // Changer les couleurs pour le graphique de ligne interactif
+      const lineColor = 'rgb(255, 0, 0)';  // Changer la couleur de la ligne (rouge ici)
+      const markerColor = 'rgb(0, 0, 255)';  // Changer la couleur des marqueurs (bleu ici)
+
+      const trace = {
+        x: years,
+        y: counts,
+        mode: 'lines+markers',
+        type: 'scatter',
+        line: { color: lineColor }, // Changer la couleur de la ligne
+        marker: { size: 8, color: markerColor } // Changer la couleur des marqueurs
+      };
+      
+      const layout = {
+        title: 'Nombre de films produits par année',
+        xaxis: { title: 'Année' },
+        yaxis: { title: 'Nombre de films produits' },
+        showlegend: false,
+        plot_bgcolor: 'rgba(0, 0, 0, 0.5)'  // Background transparent
+      };
+      
+      data = [trace];
+      Plotly.newPlot('line-chart-container', data, layout);
+
+    })
+    .catch(error => {
+      console.error('Erreur lors de la récupération des données du nombre de films produits chaque année:', error);
+    });
+
+    fetch('/films_by_country_data/')  // Remplacez cette URL par l'URL vers votre vue 'films_by_country_data'
+    .then(response => response.json())
+    .then(data => {
+      // Mettre à jour la variable filmsByCountryData avec les données récupérées
+      filmsByCountryData = data;
+
+      // Créer le graphique en pie chart interactif avec Plotly
+      const countries = filmsByCountryData['Pays'];
+      const filmCounts = filmsByCountryData['Nombre de films'];
+      let countriesArray = Object.values(countries);
+      let filmCountsArray = Object.values(filmCounts);
+
+      const trace = {
+        type: 'pie',
+        labels: countriesArray,
+        values: filmCountsArray,
+        textinfo: 'label+percent',
+        insidetextorientation: 'radial',
+        marker: {
+          colors: ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(255, 255, 0)', 'rgb(255, 0, 255)', 'rgb(0, 255, 255)'] // Changer les couleurs ici
+        }
+      };
+
+      const layout = {
+        title: 'Répartition des films par pays (Top 5 + Autres)',
+        showlegend: false
+      };
+
+      data = [trace];
+      Plotly.newPlot('pie-chart-container', data, layout);
+
+    })
+    .catch(error => {
+      console.error('Erreur lors de la récupération des données du nombre de films par pays:', error);
+    });
+</script>
+<div class="content">
+  <div class="row">
+    
+    <div class="col-md-12">
+      <div class="card ">
+        <div class="card-header">
+          <h4 class="card-title">Graphiques</h4>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <div id="histogram-container" style="width: 100%; height: 600px;"></div>
+          </div>
+          <div class="table-responsive">
+            <div id="line-chart-container" style="width: 100%; height: 600px;"></div>
+          </div>
+          <div class="table-responsive">
+            <div id="pie-chart-container" style="width: 100%; height: 600px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
