@@ -172,7 +172,9 @@
 
 <script>
     var movieTitles = {{ movie_titles | safe}};
+    var IMDb_response = {{ IMDb_response | safe}};
     jQuery(document).ready(function() {
+        console.log('IMDb_response = ', IMDb_response);
         jQuery('#search-input').autocomplete({
             source: movieTitles,
             minLength: 2
