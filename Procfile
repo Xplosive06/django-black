@@ -1,1 +1,1 @@
-web: gunicorn django-black.wsgi
+web: gunicorn core.wsgi
