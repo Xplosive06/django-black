@@ -31,8 +31,7 @@ if not SECRET_KEY:
 DEBUG = 'RENDER' not in os.environ
 
 # Docker HOST
-#ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'web-production-268b.up.railway.app', 'web-production-268b.up.railway.app/search/', "https://web-production-268b.up.railway.app"]
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'web-production-268b.up.railway.app', 'web-production-268b.up.railway.app/search/', "https://web-production-268b.up.railway.app"]
 
 # Add here your deployment HOSTS
 CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://localhost:5085', 'http://127.0.0.1:8000', 'http://127.0.0.1:5085']
@@ -51,13 +50,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
+    "corsheaders",
     "home",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -69,6 +69,19 @@ MIDDLEWARE = [
 ROOT_URLCONF = "core.urls"
 
 HOME_TEMPLATES = os.path.join(BASE_DIR, 'templates')
+
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "https://web-production-268b.up.railway.app",
+    # Ajoutez d'autres domaines autorisés si nécessaire
+]
+
+# Vous pouvez également spécifier des méthodes HTTP spécifiques que vous voulez autoriser
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+]
 
 TEMPLATES = [
     {

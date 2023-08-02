@@ -5,6 +5,7 @@ contourpy==1.1.0
 cycler==0.11.0
 Django==4.2.3
 django-admin-black==1.0.8
+django-cors-headers==4.2.0
 fonttools==4.41.1
 gunicorn==21.2.0
 idna==3.4
