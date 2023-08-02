@@ -107,7 +107,6 @@ def index(request):
     # movie_titles = json.dumps(movie_titles)
     return render(request, 'pages/dashboard.html', {'movie_titles': movie_titles})
 
-@csrf_exempt
 def search_movies(request):
     if request.method == 'POST':
         # Récupérer les termes de recherche depuis la requête POST
