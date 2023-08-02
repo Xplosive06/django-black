@@ -81,7 +81,6 @@ def get_movie_recommendations(cible, boost_score=False, nameListOnly=True):
 def get_movie_poster_url(movie_title):
     # Récupérer le lien IMDB du film
     imdb_link = df_films[df_films['movie_title'] == movie_title]['movie_imdb_link'].values[0]
-    print("imdb_link = ", imdb_link)
     # Extraire l'ID du film à partir du lien IMDB
     tt_id = imdb_link.split('/')[4]
 
@@ -92,9 +91,8 @@ def get_movie_poster_url(movie_title):
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1OGQ1MTg2ODc5Y2Y4NjJmZTYyMTQwYTljNmViNGFlMiIsInN1YiI6IjVmYWQwM2QzZDdmYmRhMDAzZDk3ZDc0NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.waE5IPpm0NeuZ17E5FjkqJWIGLpmR11pITDjEOBvqOM"
     }
     response = requests.get(url, headers=headers)
-    print("response = ", response)
     data = response.json()
-    print("data = ", data)
+
     # Accéder à "poster_path" dans le dictionnaire de résultats
     poster_path = data["movie_results"][0]["poster_path"]
 
@@ -112,12 +110,10 @@ def index(request):
 @csrf_exempt
 def search_movies(request):
     if request.method == 'POST':
-        print("request = ", request)
         # Récupérer les termes de recherche depuis la requête POST
         search_query = request.POST.get('search_query', '')
-        print("search_query = ", search_query)
         recommendations = get_movie_recommendations(search_query, True, True)
-        print("recommendations = ", recommendations)
+
         # Créer une liste pour stocker les informations des films recommandés
         search_results = []
         for movie_title in recommendations:
